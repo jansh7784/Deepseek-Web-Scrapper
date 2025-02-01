@@ -7,8 +7,8 @@ from scrape import (
 )
 from parse import parse_with_deepseek
 
-st.title("AI Web Scraper by Ansh Jain")
-st.markdown("### Made with DeepSeek-R1 API")
+st.title("AI Web Scraper with DeepSeek")
+st.markdown("### Powered by OpenRouter's DeepSeek AI")
 
 # Keep DOM chunks and full cleaned content in session state so we don't re-scrape again
 if "dom_chunks" not in st.session_state:
@@ -44,7 +44,7 @@ if st.session_state.dom_chunks:
         st.write("Parsed/Chat Response:")
         st.write(parsed_content)
 else:
-    st.markdown("### Scrape a website to use DeepSeek Chat.")
+    st.markdown("### Please scrape a website to view DOM content and use DeepSeek Chat.")
 
 st.markdown("---")
-st.markdown("**<span style='font-size:18px;'>Credits: Made by [Ansh Jain](https://www.linkedin.com/in/ansh--jain)</span>**", unsafe_allow_html=True)
+st.markdown("**Credits:** Made by [Ansh Jain](https://www.linkedin.com/in/ansh--jain) Powered by DeepSeek API.")
