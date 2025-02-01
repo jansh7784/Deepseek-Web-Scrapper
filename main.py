@@ -1,50 +1,49 @@
-import streamlit as st
-from scrape import (
-    scrape_website,
-    extract_body_content,
-    clean_body_content,
-    split_dom_content,
-)
-from parse import parse_with_deepseek
+import os
+from selenium.webdriver import Remote, ChromeOptions
+from selenium.webdriver.chromium.remote_connection import ChromiumRemoteConnection
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
 
-st.title("AI Web Scraper by Ansh Jain")
-st.markdown("### Made with DeepSeek-R1 API")
+# Load environment variables
+AUTH = os.getenv("SCRAPING_PROXY_AUTH")
+if not AUTH:
+    raise ValueError("SCRAPING_PROXY_AUTH is not set. Update your .env or GitHub Secrets.")
 
-# Keep DOM chunks and full cleaned content in session state so we don't re-scrape again
-if "dom_chunks" not in st.session_state:
-    st.session_state.dom_chunks = None
-if "cleaned_content" not in st.session_state:
-    st.session_state.cleaned_content = None
+SBR_WEBDRIVER = f"https://{AUTH}@brd.superproxy.io:9515"
 
-# Step 1: Scrape website
-url = st.text_input("Enter Website URL")
-if st.button("Scrape Website"):
-    if url:
-        dom_content = scrape_website(url)
-        body_content = extract_body_content(dom_content)
-        cleaned_content = clean_body_content(body_content)
-        st.session_state.cleaned_content = cleaned_content
-        st.session_state.dom_chunks = split_dom_content(cleaned_content)
-        st.success("Website scraped successfully and DOM content is ready!")
-    else:
-        st.warning("Please enter a URL before scraping.")
-
-st.markdown("---")
-
-# Display dropdown and chat-style parsing only if DOM content is available
-if st.session_state.dom_chunks:
-    with st.expander("View DOM Content"):
-        st.markdown("### Extracted DOM Content")
-        st.text_area("DOM Content", value=st.session_state.cleaned_content, height=300)
+def scrape_website(url):
+    print('Connecting to Scraping Browser...')
+    try:
+        sbr_connection = ChromiumRemoteConnection(SBR_WEBDRIVER, 'goog', 'chrome')
+    except Exception as e:
+        print(f"Error initializing Selenium WebDriver: {e}")
+        raise
     
-    st.markdown("#### DeepSeek Chat-Style Parsing")
-    parse_description = st.text_area("Parse/Chat Instructions", "Ask or parse multiple times here...")
-    if st.button("Parse with DeepSeek", key="parse_btn"):
-        parsed_content = parse_with_deepseek(st.session_state.dom_chunks, parse_description)
-        st.write("Parsed/Chat Response:")
-        st.write(parsed_content)
-else:
-    st.markdown("### Scrape a website to use DeepSeek Chat.")
+    options = ChromeOptions()
+    options.add_argument("--headless")  # Ensure headless mode for cloud deployment
+    
+    with Remote(sbr_connection, options=options) as driver:
+        print('Connected! Navigating...')
+        driver.get(url)
+        print('Taking page screenshot to file page.png')
+        driver.get_screenshot_as_file('./page.png')
+        print('Navigated! Scraping page content...')
+        html = driver.page_source
+        return html
 
-st.markdown("---")
-st.markdown("**<span style='font-size:18px;'>Credits: Made by [Ansh Jain](https://www.linkedin.com/in/ansh--jain)</span>**", unsafe_allow_html=True)
+def extract_body_content(html_content):
+    soup = BeautifulSoup(html_content, "html.parser")
+    body_content = soup.body
+    return str(body_content) if body_content else ""
+
+def clean_body_content(body_content):
+    soup = BeautifulSoup(body_content, "html.parser")
+    for script_or_style in soup(["script", "style"]):
+        script_or_style.extract()
+    cleaned_content = "\n".join(
+        line.strip() for line in soup.get_text(separator="\n").splitlines() if line.strip()
+    )
+    return cleaned_content
+
+def split_dom_content(dom_content, max_length=6000):
+    return [dom_content[i : i + max_length] for i in range(0, len(dom_content), max_length)]
