@@ -28,8 +28,8 @@ Follow these steps to set up the project on your local machine:
 
 1. **Clone the Repository**:
     ```sh
-    git clone https://github.com/yourusername/AI-Web-Scraper.git
-    cd AI-Web-Scraper
+    git clone https://github.com/jansh7784/Deepseek-Web-Scrapper
+    cd Deepseek-Web-Scrapper
     ```
 
 2. **Create a Virtual Environment**:
