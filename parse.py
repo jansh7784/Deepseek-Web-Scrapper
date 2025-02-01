@@ -6,7 +6,7 @@ API_KEY = os.getenv("DEEPSEEK_API_KEY")
 if not API_KEY:
     raise ValueError("DEEPSEEK_API_KEY is not set. Update your .env or GitHub Secrets.")
 
-# Enhanced template for better parsing and understanding
+# Improved template for better parsing and understanding
 TEMPLATE = """
 You are an advanced AI assistant specializing in structured data extraction from HTML.
 Your goal is to analyze and extract key insights from the provided webpage content.
@@ -45,21 +45,7 @@ def parse_with_deepseek(dom_chunks, parse_description):
             print(f"✅ API Response for Batch {i}: {text_output}")  # Debugging Line
             parsed_results.append(text_output)
         except Exception as e:
-            print(f"❌ API Call Failed for Batch {i}: {e}")  # Debugging Line
-            print(f"❌ System Prompt for Batch {i}: {system_prompt}")  # Debugging Line
-            parsed_results.append(f"[Error: Unable to process batch {i}]")
+            print(f"❌ API Call Failed: {e}")  # Debugging Line
+            parsed_results.append("[Error: Unable to process this batch]")
     
     return "\n".join(parsed_results)
-
-def main():
-    # Example data
-    dom_chunks = ["<html>...</html>", "<html>...</html>"]
-    parse_description = "Extract key information from the HTML content."
-
-    # Parsing the HTML content
-    parsed_output = parse_with_deepseek(dom_chunks, parse_description)
-    print("Parsed Output:")
-    print(parsed_output)
-
-if __name__ == "__main__":
-    main()
