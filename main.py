@@ -7,8 +7,8 @@ from scrape import (
 )
 from parse import parse_with_deepseek
 
-st.title("AI Web Scraper with DeepSeek")
-st.markdown("### Powered by OpenRouter's DeepSeek AI")
+st.title("AI Web Scraper by Ansh Jain")
+st.markdown("### Made with DeepSeek-R1 API")
 
 # Keep DOM chunks and full cleaned content in session state so we don't re-scrape again
 if "dom_chunks" not in st.session_state:
@@ -41,14 +41,10 @@ if st.session_state.dom_chunks:
     parse_description = st.text_area("Parse/Chat Instructions", "Ask or parse multiple times here...")
     if st.button("Parse with DeepSeek", key="parse_btn"):
         parsed_content = parse_with_deepseek(st.session_state.dom_chunks, parse_description)
-        if "Error:" in parsed_content:
-            st.error("Parsing failed. Please check the error message below:")
-            st.write(parsed_content)
-        else:
-            st.write("Parsed/Chat Response:")
-            st.write(parsed_content)
+        st.write("Parsed/Chat Response:")
+        st.write(parsed_content)
 else:
-    st.markdown("### Please scrape a website to view DOM content and use DeepSeek Chat.")
+    st.markdown("### Scrape a website to use DeepSeek Chat.")
 
 st.markdown("---")
-st.markdown("**Credits:** Made by [Ansh Jain](https://www.linkedin.com/in/ansh--jain) Powered by DeepSeek API.")
+st.markdown("**<span style='font-size:18px;'>Credits: Made by [Ansh Jain](https://www.linkedin.com/in/ansh--jain)</span>**", unsafe_allow_html=True)
