@@ -32,6 +32,6 @@ def parse_with_deepseek(dom_chunks, parse_description):
             parsed_results.append(text_output)
         except Exception as e:
             print(f"Request failed: {e}")
-            parsed_results.append(f"Error: {e}")
+            parsed_results.append("")
 
     return "\n".join(parsed_results)
