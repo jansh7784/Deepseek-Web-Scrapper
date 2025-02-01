@@ -1,22 +1,31 @@
 import os
-from dotenv import load_dotenv
 from openai import OpenAI
 
-# Load environment variables
-load_dotenv()
+# Load API Key from environment variables
 API_KEY = os.getenv("DEEPSEEK_API_KEY")
-
 if not API_KEY:
-    raise ValueError("Missing API key. Set DEEPSEEK_API_KEY in environment variables.")
+    raise ValueError("DEEPSEEK_API_KEY is not set. Update your .env or GitHub Secrets.")
 
-template = (
-    "You are tasked with extracting specific information from the following text content: {dom_content}. "
-    "Please follow these instructions carefully: \n\n"
-    "1. **Extract Information:** Only extract the information that directly matches the provided description: {parse_description}. "
-    "2. **No Extra Content:** Do not include any additional text, comments, or explanations in your response. "
-    "3. **Empty Response:** If no information matches the description, return an empty string ('' ). "
-    "4. **Direct Data Only:** Your output should contain only the data that is explicitly requested, with no other text."
-)
+# Improved template for better parsing and understanding
+TEMPLATE = """
+You are an advanced AI assistant specializing in structured data extraction from HTML.
+Your goal is to analyze and extract key insights from the provided webpage content.
+
+**Instructions:**
+1. Understand the provided HTML content and identify relevant information.
+2. Extract the meaningful text while removing unnecessary elements (scripts, styles, etc.).
+3. Maintain formatting and logical structure in the extracted text.
+4. Follow the specific parsing instructions provided below.
+
+---
+**HTML Content:**
+{dom_content}
+
+**Parsing Instructions:**
+{parse_description}
+
+Return the cleaned and well-structured text in a readable format.
+"""
 
 def parse_with_deepseek(dom_chunks, parse_description):
     client = OpenAI(
@@ -26,17 +35,17 @@ def parse_with_deepseek(dom_chunks, parse_description):
 
     parsed_results = []
     for i, chunk in enumerate(dom_chunks, start=1):
-        system_prompt = template.format(dom_content=chunk, parse_description=parse_description)
+        system_prompt = TEMPLATE.format(dom_content=chunk, parse_description=parse_description)
         try:
             completion = client.chat.completions.create(
-                model="deepseek/chat",  # Fixed model name
+                model="deepseek/chat",
                 messages=[{"role": "system", "content": system_prompt}]
             )
-            text_output = completion.choices[0].message.content
-            print(f"Parsed batch: {i} of {len(dom_chunks)}")
+            text_output = completion.choices[0].message.content.strip()
+            print(f"✅ API Response for Batch {i}: {text_output}")  # Debugging Line
             parsed_results.append(text_output)
         except Exception as e:
-            print(f"Request failed: {e}")
-            parsed_results.append("")
-
+            print(f"❌ API Call Failed: {e}")  # Debugging Line
+            parsed_results.append("[Error: Unable to process this batch]")
+    
     return "\n".join(parsed_results)
