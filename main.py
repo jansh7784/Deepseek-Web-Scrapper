@@ -41,8 +41,12 @@ if st.session_state.dom_chunks:
     parse_description = st.text_area("Parse/Chat Instructions", "Ask or parse multiple times here...")
     if st.button("Parse with DeepSeek", key="parse_btn"):
         parsed_content = parse_with_deepseek(st.session_state.dom_chunks, parse_description)
-        st.write("Parsed/Chat Response:")
-        st.write(parsed_content)
+        if "Error:" in parsed_content:
+            st.error("Parsing failed. Please check the error message below:")
+            st.write(parsed_content)
+        else:
+            st.write("Parsed/Chat Response:")
+            st.write(parsed_content)
 else:
     st.markdown("### Please scrape a website to view DOM content and use DeepSeek Chat.")
 

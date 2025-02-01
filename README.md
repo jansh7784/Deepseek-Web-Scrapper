@@ -78,6 +78,25 @@ Follow these steps to set up the project on your local machine:
     - Enter your parsing instructions in the "Parse/Chat Instructions" text area.
     - Click the "Parse with DeepSeek" button to extract specific information based on your instructions.
 
+## Troubleshooting
+
+If you encounter issues while parsing content using the DeepSeek API, here are some troubleshooting steps:
+
+1. **Check API Key**:
+    - Ensure that your OpenRouter API key is correctly set in the `.env` file.
+
+2. **Review Error Messages**:
+    - If parsing fails, error messages will be displayed in the Streamlit app. Review these messages to understand the issue.
+
+3. **Network Issues**:
+    - Ensure that your network connection is stable and that there are no issues with the OpenRouter API service.
+
+4. **Content Limitations**:
+    - The DeepSeek API may have limitations on the size or type of content it can process. Ensure that your content meets these requirements.
+
+5. **Logs**:
+    - Check the logs for any additional error messages or warnings that may provide more context about the issue.
+
 ## Setting Up ChromeDriver
 
 To use Selenium with Chrome, you need to have ChromeDriver installed on your machine. Follow these steps:
