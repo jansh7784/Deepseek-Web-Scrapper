@@ -1,18 +1,27 @@
+import os
 from selenium.webdriver import Remote, ChromeOptions
 from selenium.webdriver.chromium.remote_connection import ChromiumRemoteConnection
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
-import os
 
 # Load environment variables
 AUTH = os.getenv("SCRAPING_PROXY_AUTH")
+if not AUTH:
+    raise ValueError("SCRAPING_PROXY_AUTH is not set. Update your .env or GitHub Secrets.")
+
 SBR_WEBDRIVER = f"https://{AUTH}@brd.superproxy.io:9515"
 
 def scrape_website(url):
     print('Connecting to Scraping Browser...')
-    sbr_connection = ChromiumRemoteConnection(SBR_WEBDRIVER, 'goog', 'chrome')
+    try:
+        sbr_connection = ChromiumRemoteConnection(SBR_WEBDRIVER, 'goog', 'chrome')
+    except Exception as e:
+        print(f"Error initializing Selenium WebDriver: {e}")
+        raise
+    
     options = ChromeOptions()
-    options.add_argument("--headless")  # Ensuring headless mode for cloud
+    options.add_argument("--headless")  # Ensure headless mode for cloud deployment
+    
     with Remote(sbr_connection, options=options) as driver:
         print('Connected! Navigating...')
         driver.get(url)
