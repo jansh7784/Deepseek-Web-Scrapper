@@ -35,4 +35,3 @@ def parse_with_deepseek(dom_chunks, parse_description):
             parsed_results.append("")
 
     return "\n".join(parsed_results)
-    
